@@ -1,0 +1,101 @@
+{% extends "shop/base.html" %}
+{% block title %}Carrito{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-3">
+  <div>
+    <h2 class="fw-bold mb-1">Carrito</h2>
+    <div class="text-muted">Revisa tus productos antes de pagar.</div>
+  </div>
+
+  <a class="btn btn-outline-dark btn-soft" href="{% url 'product_list' %}">
+    ← Seguir comprando
+  </a>
+</div>
+
+{% if items %}
+<div class="card shadow-sm border-0" style="border-radius: 18px;">
+  <div class="card-body p-3 p-md-4">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead>
+          <tr class="text-muted">
+            <th>Producto</th>
+            <th class="text-center" style="width:220px;">Cantidad</th>
+            <th class="text-end" style="width:160px;">Subtotal</th>
+            <th class="text-end" style="width:140px;"></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for it in items %}
+          <tr>
+            <td>
+              <div class="fw-semibold">{{ it.product.name }}</div>
+              <div class="text-muted small">S/ {{ it.product.price }} c/u</div>
+            </td>
+
+            <td class="text-center">
+              <div class="d-inline-flex align-items-center gap-2">
+                <a class="btn btn-outline-secondary btn-sm btn-soft"
+                   href="{% url 'cart_decrease' it.product.id %}">−</a>
+
+                <span class="fw-bold" style="min-width: 18px; display:inline-block;">
+                  {{ it.qty }}
+                </span>
+
+                <a class="btn btn-outline-secondary btn-sm btn-soft"
+                   href="{% url 'cart_add' it.product.id %}">+</a>
+              </div>
+            </td>
+
+            <td class="text-end fw-semibold">S/ {{ it.subtotal }}</td>
+
+            <td class="text-end">
+              <a class="btn btn-outline-danger btn-sm btn-soft"
+                 href="{% url 'cart_remove' it.product.id %}">
+                Quitar
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="my-4">
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+      <a class="btn btn-outline-dark btn-soft" href="{% url 'cart_clear' %}">
+        Vaciar carrito
+      </a>
+
+      <div class="ms-auto text-end">
+        <div class="text-muted">Total</div>
+        <div class="display-6 fw-bold mb-2">S/ {{ total }}</div>
+
+        <div class="d-flex justify-content-end gap-2 flex-wrap">
+          <a class="btn btn-outline-secondary btn-soft" href="{% url 'product_list' %}">
+            Seguir comprando
+          </a>
+
+          <!-- ✅ Botón "Pagar" -->
+          <a class="btn btn-success btn-soft btn-success-soft" href="{% url 'checkout' %}">
+            Continuar / Pagar
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% else %}
+<div class="alert alert-info shadow-sm">
+  Tu carrito está vacío.
+</div>
+<a class="btn btn-primary btn-soft btn-primary-soft" href="{% url 'product_list' %}">
+  Ver productos
+</a>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "shop/base.html" %}
+{% block title %}Crear cuenta · Catálogo de Daniela{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-7 col-lg-5">
+    <div class="card shadow-sm border-0" style="border-radius:18px;">
+      <div class="card-body p-4">
+        <h3 class="fw-bold mb-1">Crear cuenta 💖</h3>
+        <div class="text-muted mb-3">Regístrate para ver tus pedidos y guardar direcciones.</div>
+
+        <form method="post" class="vstack gap-3">
+          {% csrf_token %}
+
+          <div>
+            <label class="form-label">{{ form.username.label }}</label>
+            {{ form.username }}
+            {% for e in form.username.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+
+          <div class="row g-2">
+            <div class="col-6">
+              <label class="form-label">{{ form.first_name.label }}</label>
+              {{ form.first_name }}
+              {% for e in form.first_name.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+            </div>
+            <div class="col-6">
+              <label class="form-label">{{ form.last_name.label }}</label>
+              {{ form.last_name }}
+              {% for e in form.last_name.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+            </div>
+          </div>
+
+          <div>
+            <label class="form-label">{{ form.email.label }}</label>
+            {{ form.email }}
+            {% for e in form.email.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+
+          <div>
+            <label class="form-label">{{ form.password1.label }}</label>
+            {{ form.password1 }}
+            {% for e in form.password1.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+
+          <div>
+            <label class="form-label">{{ form.password2.label }}</label>
+            {{ form.password2 }}
+            {% for e in form.password2.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {{ form.non_field_errors }}
+            </div>
+          {% endif %}
+
+          <button class="btn btn-dark btn-soft w-100" type="submit">
+            Crear cuenta
+          </button>
+
+          <div class="text-center small text-muted">
+            ¿Ya tienes cuenta?
+            <a href="{% url 'login' %}" class="text-decoration-none">Iniciar sesión</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

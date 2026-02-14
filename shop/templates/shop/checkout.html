@@ -1,0 +1,101 @@
+{% extends "shop/base.html" %}
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-3">
+  <div>
+    <h2 class="fw-bold mb-1">Checkout</h2>
+    <div class="text-muted">Completa tus datos para confirmar el pedido (pago después).</div>
+  </div>
+
+  <div class="d-flex gap-2 flex-wrap">
+    <a class="btn btn-outline-dark btn-soft" href="{% url 'cart_detail' %}">← Volver al carrito</a>
+    <a class="btn btn-outline-success btn-soft"
+       target="_blank"
+       href="https://wa.me/{{ daniela_wsp }}?text=Hola%20Daniela%2C%20quiero%20hacer%20un%20pedido%20😊">
+      WhatsApp Daniela
+    </a>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm" style="border-radius: 18px;">
+      <div class="card-body p-3 p-md-4">
+        <h5 class="fw-bold mb-3">Datos del cliente</h5>
+
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Nombre completo</label>
+              {{ form.full_name }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">WhatsApp</label>
+              {{ form.whatsapp }}
+              <div class="form-text">Ej: 999888777</div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Dirección (opcional)</label>
+              {{ form.address }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Referencia (opcional)</label>
+              {{ form.reference }}
+            </div>
+
+            <div class="col-12">
+              <label class="form-label fw-semibold">Notas (opcional)</label>
+              {{ form.notes }}
+            </div>
+          </div>
+
+          <hr class="my-4">
+
+          <button class="btn btn-success btn-soft btn-success-soft" type="submit">
+            ✅ Confirmar pedido
+          </button>
+          <a class="btn btn-outline-secondary btn-soft ms-2" href="{% url 'product_list' %}">
+            Seguir comprando
+          </a>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-sm" style="border-radius: 18px;">
+      <div class="card-body p-3 p-md-4">
+        <h5 class="fw-bold mb-3">Resumen</h5>
+
+        <div class="vstack gap-2">
+          {% for it in items %}
+          <div class="d-flex justify-content-between">
+            <div>
+              <div class="fw-semibold">{{ it.product.name }}</div>
+              <div class="text-muted small">{{ it.qty }} × S/ {{ it.product.price }}</div>
+            </div>
+            <div class="fw-bold">S/ {{ it.subtotal }}</div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <hr class="my-3">
+
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="text-muted">Total</div>
+          <div class="display-6 fw-bold">S/ {{ total }}</div>
+        </div>
+
+        <div class="alert alert-info mt-3 mb-0">
+          <b>Delivery por coordinación</b> (WhatsApp).
+          <br>El pago con Yape lo activamos después.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

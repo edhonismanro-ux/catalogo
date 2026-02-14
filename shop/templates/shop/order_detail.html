@@ -1,0 +1,142 @@
+{% extends "shop/base.html" %}
+{% block title %}{{ order.code }} · Pedido{% endblock %}
+
+{% block content %}
+<style>
+  .status-pill{
+    border-radius: 999px;
+    padding: .42rem .75rem;
+    font-weight: 900;
+    border: 1px solid rgba(255,255,255,.35);
+    box-shadow: 0 10px 20px rgba(0,0,0,.10);
+    color:#fff;
+  }
+  .st-NEW{ background: linear-gradient(135deg, rgba(99,102,241,.95), rgba(139,92,246,.95)); }
+  .st-CONFIRMED{ background: linear-gradient(135deg, rgba(59,130,246,.95), rgba(99,102,241,.95)); }
+  .st-PAID{ background: linear-gradient(135deg, rgba(34,197,94,.95), rgba(22,163,74,.95)); }
+  .st-DELIVERED{ background: linear-gradient(135deg, rgba(236,72,153,.95), rgba(139,92,246,.95)); }
+  .st-CANCELLED{ background: rgba(107,114,128,.92); color:#fff; }
+
+  .soft-line{ border-top: 1px solid rgba(17,24,39,.08); }
+
+  .btn-gradient{
+    border:0;
+    color:#fff !important;
+    border-radius: 14px;
+    font-weight: 900;
+    padding: .62rem 1.05rem;
+    background: linear-gradient(135deg, #ec4899, #8b5cf6);
+    box-shadow: 0 16px 34px rgba(236,72,153,.18);
+    transition: transform .12s ease, filter .12s ease;
+  }
+  .btn-gradient:hover{ filter: brightness(1.03); transform: translateY(-1px); }
+
+  .btn-ghost{
+    border-radius: 14px;
+    font-weight: 900;
+    padding: .62rem 1.05rem;
+    border: 1px solid rgba(17,24,39,.10);
+    background: rgba(255,255,255,.86);
+    color: #111827;
+  }
+  .btn-ghost:hover{ background: rgba(255,255,255,.96); }
+
+  .thumb{
+    width:100%;
+    max-height: 220px;
+    object-fit: cover;
+    border-radius: 16px;
+    border: 1px solid rgba(17,24,39,.08);
+    box-shadow: 0 14px 34px rgba(17,24,39,.12);
+  }
+</style>
+
+<div class="d-flex align-items-start justify-content-between flex-wrap gap-2 mb-3">
+  <div>
+    <div class="text-muted small">Tu pedido</div>
+    <h2 class="fw-bold mb-1">Pedido {{ order.code }}</h2>
+
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <span class="status-pill st-{{ order.status }}">{{ order.get_status_display }}</span>
+      <span class="text-muted">· Total: <b>S/ {{ order.total }}</b></span>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2 flex-wrap">
+    <a class="btn btn-ghost" href="{% url 'track_order' %}">← Mis pedidos</a>
+    <a class="btn btn-gradient" href="https://wa.me/51944739301" target="_blank">💬 Hablar con Daniela</a>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card glass-card border-0">
+      <div class="card-body p-4">
+        <h5 class="fw-bold mb-3">🛍️ Productos</h5>
+
+        <div class="vstack gap-3">
+          {% for it in items %}
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="fw-semibold">{{ it.product.name }}</div>
+              <div class="text-muted small">{{ it.qty }} × S/ {{ it.unit_price }}</div>
+            </div>
+            <div class="fw-bold">S/ {{ it.subtotal }}</div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <hr class="soft-line my-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="text-muted">Total</div>
+          <div class="fs-3 fw-bold">S/ {{ order.total }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card glass-card border-0">
+      <div class="card-body p-4">
+        <h5 class="fw-bold mb-2">📦 Datos</h5>
+        <div class="text-muted small">Delivery por coordinación</div>
+
+        <div class="mt-3">
+          <div><b>Cliente:</b> {{ order.full_name }}</div>
+          <div><b>WhatsApp:</b> {{ order.whatsapp }}</div>
+          {% if order.address %}<div><b>Dirección:</b> {{ order.address }}</div>{% endif %}
+          {% if order.reference %}<div><b>Referencia:</b> {{ order.reference }}</div>{% endif %}
+          {% if order.notes %}<div><b>Notas:</b> {{ order.notes }}</div>{% endif %}
+        </div>
+
+        <hr class="soft-line my-3">
+
+        <h6 class="fw-bold mb-2">📸 Comprobante (opcional)</h6>
+
+        {% if order.receipt_image %}
+          <img class="thumb mb-2" src="{{ order.receipt_image.url }}" alt="Comprobante">
+          <div class="d-flex gap-2">
+            <a class="btn btn-ghost w-50" href="{{ order.receipt_image.url }}" target="_blank">Ver grande</a>
+            <a class="btn btn-gradient w-50" href="https://wa.me/51944739301" target="_blank">Enviar por WhatsApp</a>
+          </div>
+          <div class="text-muted small mt-2">Si quieres, puedes subir otra foto para reemplazarla.</div>
+        {% else %}
+          <div class="text-muted small mb-2">
+            Si ya realizaste el pago, sube una foto clara del comprobante para que Daniela lo verifique 💖
+          </div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data" action="{% url 'upload_receipt' order.code %}" class="mt-2">
+          {% csrf_token %}
+          {{ upload_form.receipt_image }}
+          <button class="btn btn-gradient w-100 mt-2" type="submit">Subir foto</button>
+        </form>
+
+        <div class="text-muted small mt-2">
+          Tip: procura que se vea el monto y la fecha.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

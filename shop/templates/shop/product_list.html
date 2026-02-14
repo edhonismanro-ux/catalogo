@@ -1,0 +1,306 @@
+{% extends "shop/base.html" %}
+{% block title %}Productos · Catálogo de Daniela{% endblock %}
+
+{% block content %}
+<style>
+  /* Solo para esta página */
+  .hero-title{
+    letter-spacing: -.4px;
+  }
+  .filter-bar{
+    border-radius: 20px;
+    background: rgba(255,255,255,.86);
+    border: 1px solid rgba(255,255,255,.55);
+    box-shadow: 0 18px 40px rgba(17,24,39,.08);
+    backdrop-filter: blur(12px);
+  }
+  .chip{
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .3rem .6rem;
+    border-radius: 999px;
+    font-size: .86rem;
+    font-weight: 700;
+    border: 1px solid rgba(17,24,39,.08);
+    background: rgba(255,255,255,.80);
+    color: #374151;
+  }
+  .chip b{ font-weight: 900; }
+  .chip a{
+    text-decoration: none;
+    color: inherit;
+    opacity: .65;
+  }
+  .chip a:hover{ opacity: 1; }
+
+  .soft-input{
+    border-radius: 14px;
+    border: 1px solid rgba(17,24,39,.10);
+    background: rgba(255,255,255,.92);
+  }
+  .soft-input:focus{
+    border-color: rgba(236,72,153,.45);
+    box-shadow: 0 0 0 .2rem rgba(236,72,153,.12);
+  }
+
+  .btn-gradient{
+    border: 0;
+    color: #fff !important;
+    border-radius: 14px;
+    font-weight: 800;
+    padding: .55rem .95rem;
+    background: linear-gradient(135deg, #ec4899, #8b5cf6);
+    box-shadow: 0 14px 30px rgba(236,72,153,.18);
+    transition: transform .12s ease, filter .12s ease;
+  }
+  .btn-gradient:hover{
+    filter: brightness(1.03);
+    transform: translateY(-1px);
+  }
+
+  .btn-ghost{
+    border-radius: 14px;
+    font-weight: 800;
+    padding: .55rem .95rem;
+    border: 1px solid rgba(17,24,39,.10);
+    background: rgba(255,255,255,.86);
+    color: #111827;
+  }
+  .btn-ghost:hover{
+    background: rgba(255,255,255,.96);
+  }
+
+  .badge-soft{
+    border-radius: 999px;
+    padding: .38rem .6rem;
+    font-weight: 900;
+    border: 1px solid rgba(255,255,255,.35);
+    box-shadow: 0 10px 20px rgba(0,0,0,.10);
+  }
+  .badge-new{
+    color: #fff;
+    background: linear-gradient(135deg, rgba(99,102,241,.95), rgba(139,92,246,.95));
+  }
+  .badge-top{
+    color: #fff;
+    background: linear-gradient(135deg, rgba(236,72,153,.95), rgba(245,158,11,.92));
+  }
+  .badge-out{
+    color: #374151;
+    background: rgba(243,244,246,.95);
+    border: 1px solid rgba(17,24,39,.08);
+    box-shadow: none;
+  }
+
+  .img-wrap{
+    position: relative;
+    height: 210px;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(236,72,153,.10), rgba(139,92,246,.10));
+  }
+  .img-wrap img{
+    width:100%;
+    height:100%;
+    object-fit: cover;
+  }
+  .img-wrap::after{
+    content:"";
+    position:absolute; inset:0;
+    background: linear-gradient(180deg, rgba(0,0,0,.00), rgba(17,24,39,.22));
+    pointer-events:none;
+  }
+  .floating-badges{
+    position:absolute;
+    top: 12px;
+    left: 12px;
+    display:flex;
+    gap:8px;
+    z-index:2;
+  }
+
+  .price-big{
+    font-size: 1.12rem;
+    font-weight: 900;
+    letter-spacing: -.2px;
+  }
+  .muted{ color:#6b7280; }
+
+  .btn-add{
+    border: 0;
+    color: #fff !important;
+    border-radius: 14px;
+    font-weight: 900;
+    padding: .55rem .9rem;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    box-shadow: 0 14px 30px rgba(34,197,94,.16);
+    transition: transform .12s ease, filter .12s ease;
+  }
+  .btn-add:hover{
+    filter: brightness(1.03);
+    transform: translateY(-1px);
+  }
+
+  .btn-disabled{
+    border-radius: 14px;
+    font-weight: 900;
+    padding: .55rem .9rem;
+    border: 1px solid rgba(17,24,39,.10);
+    background: rgba(243,244,246,.95);
+    color: #6b7280;
+  }
+</style>
+
+<div class="d-flex align-items-end justify-content-between flex-wrap gap-2 mb-3">
+  <div>
+    <h2 class="fw-bold hero-title m-0">Productos</h2>
+    <div class="muted">Elige tus favoritos y agrégalos al carrito ✨</div>
+  </div>
+
+  <div class="d-flex gap-2 flex-wrap">
+    <a class="btn btn-ghost" href="{% url 'track_order' %}">📦 Mis pedidos</a>
+    <a class="btn btn-gradient" href="https://wa.me/51944739301" target="_blank">💬 Hablar con Daniela</a>
+  </div>
+</div>
+
+<form class="filter-bar p-3 p-md-3 mb-3" method="get">
+  <div class="row g-2 align-items-end">
+    <div class="col-12 col-md-5">
+      <label class="form-label small text-muted">Buscar</label>
+      <input class="form-control soft-input" name="q" value="{{ q }}" placeholder="Buscar producto...">
+    </div>
+
+    <div class="col-6 col-md-2">
+      <label class="form-label small text-muted">Min (S/)</label>
+      <input class="form-control soft-input" name="min" value="{{ minp }}" placeholder="0">
+    </div>
+
+    <div class="col-6 col-md-2">
+      <label class="form-label small text-muted">Max (S/)</label>
+      <input class="form-control soft-input" name="max" value="{{ maxp }}" placeholder="99">
+    </div>
+
+    <div class="col-12 col-md-2">
+      <label class="form-label small text-muted">Orden</label>
+      <select class="form-select soft-input" name="order">
+        <option value="new" {% if order == "new" %}selected{% endif %}>Más nuevos</option>
+        <option value="price_asc" {% if order == "price_asc" %}selected{% endif %}>Precio ↑</option>
+        <option value="price_desc" {% if order == "price_desc" %}selected{% endif %}>Precio ↓</option>
+      </select>
+    </div>
+
+    <div class="col-12 col-md-1 d-grid">
+      <button class="btn btn-gradient" type="submit">Filtrar</button>
+    </div>
+  </div>
+
+  {% if q or minp or maxp or order != "new" %}
+    <div class="mt-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <div class="d-flex flex-wrap gap-2">
+        {% if q %}
+          <span class="chip">🔎 <b>{{ q }}</b></span>
+        {% endif %}
+        {% if minp %}
+          <span class="chip">Min: <b>S/ {{ minp }}</b></span>
+        {% endif %}
+        {% if maxp %}
+          <span class="chip">Max: <b>S/ {{ maxp }}</b></span>
+        {% endif %}
+        {% if order != "new" %}
+          <span class="chip">Orden: <b>
+            {% if order == "price_asc" %}Precio ↑{% elif order == "price_desc" %}Precio ↓{% else %}Más nuevos{% endif %}
+          </b></span>
+        {% endif %}
+      </div>
+
+      <a class="btn btn-ghost" href="{% url 'product_list' %}">Limpiar filtros ✨</a>
+    </div>
+  {% endif %}
+</form>
+
+<div class="row g-3">
+  {% for p in products %}
+  <div class="col-12 col-sm-6 col-lg-4">
+    <div class="card card-product h-100">
+      <div class="img-wrap">
+        <div class="floating-badges">
+          {# Nuevo = si está en los 6 primeros del listado (por el order actual) #}
+          {% if forloop.counter <= 6 %}
+            <span class="badge badge-soft badge-new">Nuevo</span>
+          {% endif %}
+          {# Top = precio alto (solo efecto visual) #}
+          {% if p.price|floatformat:0|add:"0" >= 80 %}
+            <span class="badge badge-soft badge-top">Top</span>
+          {% endif %}
+          {% if p.stock <= 0 %}
+            <span class="badge badge-soft badge-out">Sin stock</span>
+          {% endif %}
+        </div>
+
+        {% if p.image %}
+          <img src="{{ p.image.url }}" alt="{{ p.name }}">
+        {% else %}
+          <div class="d-flex align-items-center justify-content-center h-100">
+            <span class="text-muted fw-semibold">Sin imagen</span>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start gap-2">
+          <h5 class="card-title fw-bold mb-1">{{ p.name }}</h5>
+        </div>
+
+        {% if p.description %}
+          <div class="text-muted small mb-2" style="min-height: 1.2rem;">
+            {{ p.description|truncatechars:72 }}
+          </div>
+        {% else %}
+          <div class="text-muted small mb-2" style="min-height: 1.2rem;">
+            Producto seleccionado por Daniela ✨
+          </div>
+        {% endif %}
+
+        <div class="d-flex align-items-center justify-content-between mt-2">
+          <div class="muted">Precio</div>
+          <div class="price-big">S/ {{ p.price }}</div>
+        </div>
+
+        <div class="d-flex gap-2 mt-3">
+          <a class="btn btn-ghost w-50" href="{% url 'product_detail' p.id %}">Ver</a>
+
+          {% if p.stock > 0 %}
+            <a class="btn btn-add w-50" href="{% url 'cart_add' p.id %}">Agregar</a>
+          {% else %}
+            <button class="btn btn-disabled w-50" disabled>Agotado</button>
+          {% endif %}
+        </div>
+
+        <div class="mt-3 d-flex align-items-center justify-content-between">
+          <div class="muted small">
+            {% if p.stock > 0 %}
+              Stock: <b>{{ p.stock }}</b>
+            {% else %}
+              Disponible pronto 💖
+            {% endif %}
+          </div>
+          <a class="text-decoration-none small fw-bold" href="https://wa.me/51944739301" target="_blank" style="color:#8b5cf6;">
+            Consultar
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+    <div class="col-12">
+      <div class="glass-card p-4">
+        <h5 class="fw-bold mb-1">No encontramos productos 😢</h5>
+        <div class="text-muted">Prueba quitando filtros o buscando otra palabra.</div>
+        <div class="mt-3">
+          <a class="btn btn-gradient" href="{% url 'product_list' %}">Ver todo</a>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

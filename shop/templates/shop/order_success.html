@@ -1,0 +1,40 @@
+{% extends "shop/base.html" %}
+{% block title %}Pedido creado{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm" style="border-radius: 18px;">
+  <div class="card-body p-4">
+    <h2 class="fw-bold mb-2">✅ Pedido creado</h2>
+    <p class="text-muted mb-3">
+      Tu pedido fue registrado correctamente. En breve Daniela te contactará para coordinar el delivery.
+    </p>
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="p-3 bg-light rounded-3">
+          <div class="text-muted">Pedido</div>
+          <div class="fs-5 fw-bold">#{{ order.id }}</div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="p-3 bg-light rounded-3">
+          <div class="text-muted">Total</div>
+          <div class="fs-5 fw-bold">S/ {{ order.total }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2 flex-wrap mt-4">
+      <a class="btn btn-primary btn-soft btn-primary-soft" href="{% url 'product_list' %}">
+        Volver al catálogo
+      </a>
+
+      <a class="btn btn-outline-success btn-soft"
+         target="_blank"
+         href="https://wa.me/{{ daniela_wsp }}?text=Hola%20Daniela%2C%20hice%20el%20pedido%20%23{{ order.id }}%20por%20S/%20{{ order.total }}.%20Quiero%20coordinar%20la%20entrega%20😊">
+        WhatsApp Daniela
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

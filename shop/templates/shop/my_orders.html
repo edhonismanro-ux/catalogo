@@ -1,0 +1,72 @@
+{% extends "shop/base.html" %}
+{% block title %}Mis pedidos · Catálogo de Daniela{% endblock %}
+
+{% block content %}
+<div class="glass-card p-4 mb-3">
+  <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
+    <div>
+      <h2 class="fw-bold mb-1">Mis pedidos</h2>
+      <div class="text-muted">Aquí ves el estado del pedido y del pago (en proceso, confirmado, pagado, etc.).</div>
+    </div>
+    <a class="btn btn-fem btn-soft" href="{% url 'product_list' %}">✨ Seguir comprando</a>
+  </div>
+</div>
+
+<div class="row g-3">
+  {% for o in orders %}
+  <div class="col-12 col-lg-6">
+    <div class="glass-card p-4">
+      <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+        <div>
+          <div class="fw-bold">Pedido {{ o.code }}</div>
+          <div class="text-muted small">Fecha: {{ o.created_at|date:"d/m/Y H:i" }}</div>
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap justify-content-end">
+          {# ✅ Estado del PEDIDO (status) #}
+          {% if o.status == "confirmed" %}
+            <span class="badge rounded-pill text-bg-success">Confirmado</span>
+          {% elif o.status == "cancelled" %}
+            <span class="badge rounded-pill text-bg-secondary">Cancelado</span>
+          {% elif o.status == "delivered" %}
+            <span class="badge rounded-pill text-bg-primary">Entregado</span>
+          {% else %}
+            <span class="badge rounded-pill text-bg-dark">En proceso</span>
+          {% endif %}
+
+          {# ✅ Estado del PAGO (payment_status) #}
+          {% if o.payment_status == "paid" %}
+            <span class="badge rounded-pill text-bg-success">Pagado</span>
+          {% elif o.payment_status == "pending_review" %}
+            <span class="badge rounded-pill text-bg-warning text-dark">En revisión</span>
+          {% else %}
+            <span class="badge rounded-pill text-bg-light text-dark border">No pagado</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <hr class="my-3">
+
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="text-muted">Total</div>
+        <div class="fw-bold">S/ {{ o.total }}</div>
+      </div>
+
+      <div class="mt-3 d-flex gap-2">
+        <a class="btn btn-light-soft btn-soft w-100" href="{% url 'order_detail_code' o.code %}">
+          Ver detalle
+        </a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12">
+    <div class="glass-card p-4">
+      <div class="fw-bold mb-1">Aún no tienes pedidos</div>
+      <div class="text-muted">Cuando compres, aparecerán aquí.</div>
+      <a class="btn btn-fem btn-soft mt-3" href="{% url 'product_list' %}">Ver productos</a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
