@@ -37,7 +37,6 @@ RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
 # HOSTS / CSRF
 # =========================
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
-
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
@@ -84,7 +83,7 @@ ROOT_URLCONF = "catalogo.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],  # opcional templates globales
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -149,12 +148,14 @@ STATICFILES_DIRS = []
 if (BASE_DIR / "static").exists():
     STATICFILES_DIRS = [BASE_DIR / "static"]
 
+# ✅ IMPORTANTE: NO usar Manifest en tu caso (te rompe por .map faltante)
 STORAGES = {
-    # ⚠️ En Render, MEDIA local NO es persistente (se borra al redeploy).
-    # Para producción real: Cloudinary / S3.
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
 }
+
+# (Opcional, por compatibilidad si alguna lib lo lee)
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
