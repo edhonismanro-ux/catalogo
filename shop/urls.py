@@ -1,8 +1,9 @@
-from django.urls import path
-from . import views
 from django.urls import path, include
+from . import views
+
 urlpatterns = [
     path("accounts/", include("shop.auth_urls")),
+
     path("", views.home, name="home"),
     path("productos/", views.product_list, name="product_list"),
     path("producto/<int:pk>/", views.product_detail, name="product_detail"),
@@ -24,4 +25,10 @@ urlpatterns = [
     # extras
     path("sobre/", views.about, name="about"),
     path("contacto/", views.contact, name="contact"),
+
+    # ✅ Culqi: crear orden para QR (monto automático)
+    path("pago/culqi/orden/<str:code>/", views.culqi_create_order, name="culqi_create_order"),
+
+    # ✅ Culqi: webhook para marcar pagado
+    path("webhooks/culqi/", views.culqi_webhook, name="culqi_webhook"),
 ]

@@ -207,3 +207,7 @@ JAZZMIN_SETTINGS = {
     "show_sidebar": True,
     "navigation_expanded": True,
 }
+CULQI_PUBLIC_KEY = os.environ.get("CULQI_PUBLIC_KEY", "")
+CULQI_SECRET_KEY = os.environ.get("CULQI_SECRET_KEY", "")
+CULQI_RSA_ID = os.environ.get("CULQI_RSA_ID", "")
+CULQI_RSA_PUBLIC_KEY = os.environ.get("CULQI_RSA_PUBLIC_KEY", "")

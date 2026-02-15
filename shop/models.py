@@ -66,7 +66,7 @@ class Order(models.Model):
     full_name = models.CharField("Nombre completo", max_length=120, default="")
     whatsapp = models.CharField("WhatsApp", max_length=30, default="")
 
-    # ✅ delivery por coordinación (si usa dirección guardada, puedes copiar acá)
+    # ✅ delivery por coordinación
     address = models.CharField("Dirección", max_length=180, blank=True, null=True)
     reference = models.CharField("Referencia", max_length=180, blank=True, null=True)
     notes = models.TextField("Notas", blank=True, null=True)
@@ -75,8 +75,15 @@ class Order(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="new")
 
     payment_status = models.CharField(max_length=20, choices=PAYMENT_CHOICES, default="unpaid")
+    paid_at = models.DateTimeField("Pagado el", blank=True, null=True)
+
     receipt_image = models.ImageField("Comprobante", upload_to="receipts/", blank=True, null=True)
     receipt_uploaded_at = models.DateTimeField(blank=True, null=True)
+
+    # ✅ Culqi (para QR con monto automático + webhook)
+    culqi_order_id = models.CharField(max_length=60, blank=True, null=True, unique=True)
+    culqi_last_state = models.CharField(max_length=30, blank=True, default="")
+    culqi_last_event_at = models.DateTimeField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -92,7 +99,6 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     qty = models.PositiveIntegerField(default=1)
 
-    # ✅ mejor nombre que "price"
     unit_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 

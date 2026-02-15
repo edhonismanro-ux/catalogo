@@ -1,4 +1,5 @@
 {% extends "shop/base.html" %}
+{% load static %}
 {% block title %}{{ order.code }} · Pedido{% endblock %}
 
 {% block content %}
@@ -48,6 +49,35 @@
     border-radius: 16px;
     border: 1px solid rgba(17,24,39,.08);
     box-shadow: 0 14px 34px rgba(17,24,39,.12);
+  }
+
+  .pay-wrap{
+    border: 1px solid rgba(17,24,39,.08);
+    background: rgba(255,255,255,.70);
+    border-radius: 18px;
+    padding: 14px;
+  }
+
+  .qr-img{
+    width: 100%;
+    max-width: 260px;
+    border-radius: 16px;
+    border: 1px solid rgba(17,24,39,.08);
+    box-shadow: 0 14px 34px rgba(17,24,39,.12);
+  }
+
+  .toastx{
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 9999;
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: rgba(17,24,39,.92);
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 18px 50px rgba(0,0,0,.22);
+    display:none;
   }
 </style>
 
@@ -111,6 +141,42 @@
 
         <hr class="soft-line my-3">
 
+        <!-- ✅ PAGO YAPE (manual pero fácil) -->
+        <div class="pay-wrap mb-3">
+          <div class="fw-bold mb-1">💚 Paga con Yape</div>
+          <div class="text-muted small mb-2">
+            Escanea el QR y paga exactamente <b>S/ {{ order.total }}</b>.
+            Luego sube tu comprobante abajo 💖
+          </div>
+
+          <div class="d-flex gap-3 align-items-center flex-wrap">
+            <div class="text-center">
+              <img class="qr-img" src="{% static 'img/yape_qr.png' %}" alt="QR Yape">
+              <div class="text-muted small mt-2">QR Yape</div>
+            </div>
+
+            <div class="flex-grow-1">
+              <div class="text-muted small">Monto</div>
+              <div class="fw-bold fs-4 mb-2">S/ <span id="payAmount">{{ order.total }}</span></div>
+
+              <div class="text-muted small">Número Yape</div>
+              <div class="fw-bold fs-5 mb-3" id="payPhone">51944739301</div>
+
+              <div class="d-grid gap-2">
+                <button type="button" class="btn btn-ghost" id="btnCopyAmount">📋 Copiar monto</button>
+                <button type="button" class="btn btn-ghost" id="btnCopyPhone">📋 Copiar número</button>
+                <button type="button" class="btn btn-gradient" id="btnWhatsApp">
+                  ✅ Ya pagué — Enviar mensaje por WhatsApp
+                </button>
+              </div>
+
+              <div class="text-muted small mt-2">
+                Consejo: al pagar, en el mensaje pon <b>{{ order.code }}</b>.
+              </div>
+            </div>
+          </div>
+        </div>
+
         <h6 class="fw-bold mb-2">📸 Comprobante (opcional)</h6>
 
         {% if order.receipt_image %}
@@ -139,4 +205,58 @@
     </div>
   </div>
 </div>
+
+<div class="toastx" id="toastx">Copiado ✅</div>
+
+<script>
+  const toastx = document.getElementById("toastx");
+  function showToast(msg){
+    toastx.textContent = msg || "Copiado ✅";
+    toastx.style.display = "block";
+    setTimeout(() => toastx.style.display = "none", 1400);
+  }
+
+  async function copyText(text){
+    try{
+      await navigator.clipboard.writeText(text);
+      return true;
+    }catch(e){
+      // fallback
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return ok;
+    }
+  }
+
+  const amount = document.getElementById("payAmount").innerText.trim();  // "174.54"
+  const phone = document.getElementById("payPhone").innerText.trim();    // "51944739301"
+  const code = "{{ order.code }}";
+
+  document.getElementById("btnCopyAmount").addEventListener("click", async () => {
+    // copiamos solo el número, sin "S/"
+    const ok = await copyText(amount);
+    showToast(ok ? "Monto copiado ✅" : "No se pudo copiar");
+  });
+
+  document.getElementById("btnCopyPhone").addEventListener("click", async () => {
+    const ok = await copyText(phone);
+    showToast(ok ? "Número copiado ✅" : "No se pudo copiar");
+  });
+
+  document.getElementById("btnWhatsApp").addEventListener("click", () => {
+    const msg =
+      `Hola Daniela 💖, ya realicé el pago por Yape.\n` +
+      `Pedido: ${code}\n` +
+      `Monto: S/ ${amount}\n` +
+      `Adjunto mi comprobante por la web (o por aquí).`;
+
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+    window.open(url, "_blank");
+  });
+</script>
+
 {% endblock %}
